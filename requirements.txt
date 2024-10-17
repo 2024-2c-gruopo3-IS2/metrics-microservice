@@ -1,0 +1,7 @@
+fastapi
+uvicorn
+requests
+pydantic
+os
+dotenv
+datetime
