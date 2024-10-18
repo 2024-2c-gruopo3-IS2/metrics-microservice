@@ -54,7 +54,13 @@ class MonitoringRepository:
                 'resolutionSeconds': 60 * 10
             }
         )
-        return [cpu_usage["value"] for cpu_usage in response.json()[0]["values"]]
+
+        if response.json() == []:
+            return [0] * 7
+        cpu_usage = [cpu_usage["value"] for cpu_usage in response.json()[0]["values"]]
+
+        if len(cpu_usage) < 7:
+            return [0] * (7-len(cpu_usage)) + cpu_usage
     
     def get_memory_usage(self, service_id: str):
         url = 'https://api.render.com/v1/metrics/memory'
@@ -71,4 +77,10 @@ class MonitoringRepository:
             }
 
         )
-        return [memory_usage["value"]/1000000 for memory_usage in response.json()[0]["values"]]
+        if response.json() == []:
+            return [0] * 7
+        
+        memory_usage = [memory_usage["value"]/1000000 for memory_usage in response.json()[0]["values"]]
+
+        if len(memory_usage) < 7:
+            return [0] * (7-len(memory_usage)) + memory_usage
