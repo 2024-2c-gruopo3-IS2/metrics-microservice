@@ -73,6 +73,8 @@ class MonitoringService:
 
             time_running_str = f"{days} días, {hours} horas, {minutes} minutos"
 
+            print("service id ", service_data["service"]["id"])
+
             cpu_usage = self.repository.get_cpu_usage(service_data["service"]["id"])
             memory_usage = self.repository.get_memory_usage(service_data["service"]["id"])
 

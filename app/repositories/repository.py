@@ -55,12 +55,18 @@ class MonitoringRepository:
             }
         )
 
+        print("response", response.json())
+
         if response.json() == []:
             return [0] * 7
+        
         cpu_usage = [cpu_usage["value"] for cpu_usage in response.json()[0]["values"]]
+
+        print("cpu_usage", cpu_usage)
 
         if len(cpu_usage) < 7:
             return [0] * (7-len(cpu_usage)) + cpu_usage
+        return cpu_usage
     
     def get_memory_usage(self, service_id: str):
         url = 'https://api.render.com/v1/metrics/memory'
@@ -84,3 +90,4 @@ class MonitoringRepository:
 
         if len(memory_usage) < 7:
             return [0] * (7-len(memory_usage)) + memory_usage
+        return memory_usage
