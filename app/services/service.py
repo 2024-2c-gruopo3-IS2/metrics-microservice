@@ -118,3 +118,40 @@ class MonitoringService:
                 raise HTTPException(status_code=response.status_code, detail=response.text)
             return {"message": "Service resumed"}
         return {"error": "Service not found"}
+    
+    def get_metrics(self):
+        return self.repository.get_metrics()
+    
+    def add_metric(self, metric_name: str, value: str):
+        # Validar que la métrica existe
+        valid_metrics = [
+            "signups", "signups_failed", "logins", "logins_failed",
+            "logins_google", "logins_google_failed", "blocks",
+            "password_recovers", "password_recover_failed", "geographic_zones"
+        ]
+        if metric_name not in valid_metrics:
+            raise ValueError(f"Metric '{metric_name}' is not a valid metric.")
+        
+        if metric_name in ["signups", "signups_failed", "logins", "logins_failed", "logins_google", "logins_google_failed", "password_recovers", "password_recover_failed"]:
+            try:
+                value = float(value)
+            except ValueError:
+                raise ValueError("Value must be an integer.")
+        elif metric_name == "geographic_zones":
+            country = value.split(",")[0]
+            
+            metrics = self.repository.get_metrics()
+            prev_geographics_zones = metrics.get("geographic_zones", {})
+            print("prev_geographics_zones", prev_geographics_zones)
+            prev_value = 0
+            for zone in prev_geographics_zones:
+                prev_country = zone.split(",")[0]
+                if prev_country == country:
+                    prev_value = int(zone.split(",")[1])
+                    self.repository.delete_geographic_zone(zone)
+                    break
+            value_act = int(value.split(",")[1])
+            value = f"{country},{str(prev_value + value_act)}"
+
+
+        self.repository.add_metric(metric_name, value)
